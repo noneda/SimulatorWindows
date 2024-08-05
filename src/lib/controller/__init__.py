@@ -32,28 +32,26 @@ class Computer(Status):
         pass
 
     #* These are Errors that it can Be Present
-    def KeyBoardDontGetEnymore(self) -> bool:
+    def KeyBoardDontGetEnymore(self):
         if len(self.Keyboard) >= 10:
-            self.Error.SlowPerformance = True
-            return True
-        elif len(self.Keyboard) >= 20:
-            self.Error.SlowPerformance = True
-            return True
-        else:
-            return False        
+            if self.Error.SlowPerformance:
+                self.Error.ErrorToLoad = True
+            else:
+                self.Error.SlowPerformance = True
 
-    def ProcessDontGetEnymoressMore(self) -> bool:
-        if len(self.Process) >= 2:
+        elif len(self.Keyboard) >= 20:
             self.Error.ErrorToLoad = True
-            return True
+    
+
+    def ProcessDontGetEnymoressMore(self):
+        if len(self.Process) >= 2:
+            if self.Error.SlowPerformance:
+                self.Error.ErrorToLoad = True
+            else:
+                self.Error.SlowPerformance = True
         elif len(self.Keyboard) >= 5:
             self.Error.ErrorToLoad = True
-            return True
-        else:
-            return False
 
-    def IsDead(self) -> bool:
+    def IsDead(self):
         if self.Error.ErrorToLoad == True and self.Error.SlowPerformance: 
             self.Error.BlueScreenOfDead = True
-        else:
-            return False

@@ -1,13 +1,19 @@
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.graphics import Rectangle, Color, Ellipse
 from kivy.core.window import Window
 from kivy.clock import Clock
+from .process import Process
 
 class DesktopWidget(Widget):
+
+    process = list[Process]
+
     def __init__(self, **kwargs):
-        super(DesktopWidget, self).__init__(**kwargs)    
-               # Fondo azul
+        super(DesktopWidget, self).__init__(**kwargs)
+        
+        # Fondo azul
         with self.canvas.before:
             Color(0, 0, 1, 1)  # Color azul
             self.rect = Rectangle(size=Window.size, pos=self.pos)
@@ -21,6 +27,7 @@ class DesktopWidget(Widget):
 
         # Botón de inicio
         self.start_button = Widget(size=(40, 40), pos=(0, 0))
+        self.taskbar_pos_x = 40 + 10 
         with self.start_button.canvas:
             self.button_color = Color(0, 1, 0, 1)  # Color verde
             self.button = Ellipse(pos=self.start_button.pos, size=self.start_button.size)
@@ -29,12 +36,29 @@ class DesktopWidget(Widget):
         self.taskbar.add_widget(self.start_button)
 
         # Etiqueta para mostrar la cuenta regresiva
-        self.counter_label = Label(text='5', size_hint=(None, None), size=(100, 50), pos=(self.start_button.width + 10, self.start_button.y - 50 - 10))
+        self.counter_label = Label(text='5', font_size='40sp', size_hint=(None, None), size=(200, 100))
         self.add_widget(self.counter_label)
+        self.counter_label.canvas.before.add(Color(0.5, 0.5, 0.5, 1))  # Fondo gris
+        self.counter_label_rect = Rectangle(size=self.counter_label.size)
+        self.counter_label.canvas.before.add(self.counter_label_rect)
+        self.counter_label.opacity = 0  # Hacer que el cuadro de contador sea invisible al inicio
 
         # Inicializar el contador
         self.counter_event = None
         self.counter = 5
+
+        self.launch_button = Button(text='Abrir Proceso', size_hint=(None, None), size=(120, 40), pos=(50, Window.height - 100))
+        self.launch_button.bind(on_press=self.create_process)
+        self.add_widget(self.launch_button)
+
+        # Actualizar la posición del contador
+        self.update_label_position()
+
+    def update_label_position(self, *args):
+        # Centrar el label
+        self.counter_label.center_x = Window.width / 2
+        self.counter_label.center_y = Window.height / 2
+        self.counter_label_rect.pos = self.counter_label.pos
 
     def update_button(self, instance, value):
         self.button.pos = instance.pos
@@ -50,6 +74,8 @@ class DesktopWidget(Widget):
                 self.button_color.r = 1
                 self.button_color.g = 0
                 self.button_color.b = 0
+                # Mostrar el cuadro de contador
+                self.counter_label.opacity = 1
             else:
                 # Cancelar la cuenta regresiva
                 if self.counter_event is not None:
@@ -60,6 +86,8 @@ class DesktopWidget(Widget):
                     self.button_color.r = 0
                     self.button_color.g = 1
                     self.button_color.b = 0
+                    # Ocultar el cuadro de contador
+                    self.counter_label.opacity = 0
 
     def update_counter(self, dt):
         self.counter -= 1
@@ -74,3 +102,27 @@ class DesktopWidget(Widget):
             self.button_color.g = 1
             self.button_color.b = 0
             self.counter_label.text = '0'
+            # Ocultar el cuadro de contador
+            self.counter_label.opacity = 0
+
+
+    def create_process(self, instance):
+        process = Process()
+        self.process.append(process)
+        self.add_widget(process)
+        self.add_process_to_taskbar(process)
+
+    def add_process_to_taskbar(self, process):
+        taskbar_icon = Widget(size=(40, 40), pos=( self.taskbar_pos_x, 0))
+        self.taskbar_pos_x += 50
+        with taskbar_icon.canvas:
+            Color(0,0,0)  # Color gris
+            Rectangle(size=taskbar_icon.size, pos=taskbar_icon.pos)
+        taskbar_icon.bind(on_touch_down=lambda instance, touch: self.remove_process(instance, process))
+        self.taskbar.add_widget(taskbar_icon)
+
+    def remove_process(self, instance, process):
+        if process in self.process:
+            self.remove_widget(process)
+            self.processes.remove(process)
+            self.taskbar.remove_widget(instance)
