@@ -1,10 +1,15 @@
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.graphics import Rectangle, Color, Ellipse
 from kivy.core.window import Window
 from kivy.clock import Clock
+from .process import Process
 
 class DesktopWidget(Widget):
+
+    process = list[Process]
+
     def __init__(self, **kwargs):
         super(DesktopWidget, self).__init__(**kwargs)
         
@@ -22,6 +27,7 @@ class DesktopWidget(Widget):
 
         # Botón de inicio
         self.start_button = Widget(size=(40, 40), pos=(0, 0))
+        self.taskbar_pos_x = 40 + 10 
         with self.start_button.canvas:
             self.button_color = Color(0, 1, 0, 1)  # Color verde
             self.button = Ellipse(pos=self.start_button.pos, size=self.start_button.size)
@@ -40,6 +46,10 @@ class DesktopWidget(Widget):
         # Inicializar el contador
         self.counter_event = None
         self.counter = 5
+
+        self.launch_button = Button(text='Abrir Proceso', size_hint=(None, None), size=(120, 40), pos=(50, Window.height - 100))
+        self.launch_button.bind(on_press=self.create_process)
+        self.add_widget(self.launch_button)
 
         # Actualizar la posición del contador
         self.update_label_position()
@@ -94,3 +104,25 @@ class DesktopWidget(Widget):
             self.counter_label.text = '0'
             # Ocultar el cuadro de contador
             self.counter_label.opacity = 0
+
+
+    def create_process(self, instance):
+        process = Process()
+        self.process.append(process)
+        self.add_widget(process)
+        self.add_process_to_taskbar(process)
+
+    def add_process_to_taskbar(self, process):
+        taskbar_icon = Widget(size=(40, 40), pos=( self.taskbar_pos_x, 0))
+        self.taskbar_pos_x += 50
+        with taskbar_icon.canvas:
+            Color(0,0,0)  # Color gris
+            Rectangle(size=taskbar_icon.size, pos=taskbar_icon.pos)
+        taskbar_icon.bind(on_touch_down=lambda instance, touch: self.remove_process(instance, process))
+        self.taskbar.add_widget(taskbar_icon)
+
+    def remove_process(self, instance, process):
+        if process in self.process:
+            self.remove_widget(process)
+            self.processes.remove(process)
+            self.taskbar.remove_widget(instance)
