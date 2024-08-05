@@ -6,16 +6,6 @@ from kivy.clock import Clock
 
 class DesktopWidget(Widget):
     def __init__(self, **kwargs):
-        super(DesktopWidget, self).__init__(**kwargs)    
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.label import Label
-from kivy.graphics import Rectangle, Color, Ellipse
-from kivy.core.window import Window
-from kivy.clock import Clock
-
-class DesktopWidget(Widget):
-    def __init__(self, **kwargs):
         super(DesktopWidget, self).__init__(**kwargs)
         
         # Fondo azul
@@ -40,16 +30,25 @@ class DesktopWidget(Widget):
         self.taskbar.add_widget(self.start_button)
 
         # Etiqueta para mostrar la cuenta regresiva
-        self.counter_label = Label(text='5', font_size='40sp', size_hint=(None, None), size=(200, 100), pos=(self.start_button.width + 50, 50))
+        self.counter_label = Label(text='5', font_size='40sp', size_hint=(None, None), size=(200, 100))
+        self.add_widget(self.counter_label)
         self.counter_label.canvas.before.add(Color(0.5, 0.5, 0.5, 1))  # Fondo gris
-        self.counter_label_rect = Rectangle(size=self.counter_label.size, pos=self.counter_label.pos)
+        self.counter_label_rect = Rectangle(size=self.counter_label.size)
         self.counter_label.canvas.before.add(self.counter_label_rect)
         self.counter_label.opacity = 0  # Hacer que el cuadro de contador sea invisible al inicio
-        self.add_widget(self.counter_label)
 
         # Inicializar el contador
         self.counter_event = None
         self.counter = 5
+
+        # Actualizar la posición del contador
+        self.update_label_position()
+
+    def update_label_position(self, *args):
+        # Centrar el label
+        self.counter_label.center_x = Window.width / 2
+        self.counter_label.center_y = Window.height / 2
+        self.counter_label_rect.pos = self.counter_label.pos
 
     def update_button(self, instance, value):
         self.button.pos = instance.pos
