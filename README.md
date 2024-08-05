@@ -233,3 +233,24 @@ classDiagram
     DesktopWidget --> CountdownBox
     DesktopWidget --> Process
     DesktopWidget --> BlueDeathScreen
+```
+
+```mermaid
+flowchart TD
+    A[Start] --> B[DesktopWidget Initialized]
+    B --> C[Start Button Pressed]
+    C -->|Countdown Started| D[CountdownBox Initialized]
+    C -->|Process Button Pressed| E[Process Created]
+    D --> F[Display Countdown]
+    F -->|Countdown Finished| G[End Countdown]
+    F -->|Countdown Canceled| H[Countdown Canceled]
+    G --> I[Hide Countdown Box]
+    H --> I
+    E --> J[Add Process to Taskbar]
+    J --> K[Drag and Drop Process]
+    K --> L[Remove Process]
+    L --> J
+    J -->|Max Processes Reached| M[Show BlueDeathScreen]
+    M --> N[Animate BlueDeathScreen]
+    N --> O[Terminate Application]
+```
