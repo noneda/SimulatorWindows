@@ -107,6 +107,10 @@ class DesktopWidget(Widget):
             # Ocultar el cuadro de contador
             self.counter_label.opacity = 0
 
+        if self.counter == 0:
+            app = self.App.get_running_app()
+            app.Off()
+
     def create_process(self, instance):
         if len(self.process) <= 5:
             obj = Process()
