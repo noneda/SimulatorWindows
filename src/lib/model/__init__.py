@@ -9,7 +9,7 @@ class Errors:
 
 @dataclass
 class Status:
-    On : bool
+    on : bool
     Screen : ComputerApp
     Process : list[int]
     Keyboard : str

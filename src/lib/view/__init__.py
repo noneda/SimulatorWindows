@@ -4,6 +4,7 @@ from kivy.clock import Clock
 
 from .Boot import AnimationWidget
 from .Desktop import DesktopWidget
+from .ScreenDead import BlueDeathScreen
 
 class ComputerApp(App):
     def build(self):
@@ -18,6 +19,11 @@ class ComputerApp(App):
 
     def switch_to_desktop(self):
         self.root.clear_widgets()
-        self.root.add_widget(DesktopWidget())
+        self.root.add_widget(DesktopWidget(self))
 
+    def siwth_to_dead(self):
+        self.root.clear_widgets()
+        self.root.add_widget(BlueDeathScreen(self))
 
+    def Off(self):
+        App.get_running_app().stop()
