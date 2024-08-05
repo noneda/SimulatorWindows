@@ -7,7 +7,18 @@ from kivy.clock import Clock
 class DesktopWidget(Widget):
     def __init__(self, **kwargs):
         super(DesktopWidget, self).__init__(**kwargs)    
-               # Fondo azul
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.graphics import Rectangle, Color, Ellipse
+from kivy.core.window import Window
+from kivy.clock import Clock
+
+class DesktopWidget(Widget):
+    def __init__(self, **kwargs):
+        super(DesktopWidget, self).__init__(**kwargs)
+        
+        # Fondo azul
         with self.canvas.before:
             Color(0, 0, 1, 1)  # Color azul
             self.rect = Rectangle(size=Window.size, pos=self.pos)
@@ -29,7 +40,11 @@ class DesktopWidget(Widget):
         self.taskbar.add_widget(self.start_button)
 
         # Etiqueta para mostrar la cuenta regresiva
-        self.counter_label = Label(text='5', size_hint=(None, None), size=(100, 50), pos=(self.start_button.width + 10, self.start_button.y - 50 - 10))
+        self.counter_label = Label(text='5', font_size='40sp', size_hint=(None, None), size=(200, 100), pos=(self.start_button.width + 50, 50))
+        self.counter_label.canvas.before.add(Color(0.5, 0.5, 0.5, 1))  # Fondo gris
+        self.counter_label_rect = Rectangle(size=self.counter_label.size, pos=self.counter_label.pos)
+        self.counter_label.canvas.before.add(self.counter_label_rect)
+        self.counter_label.opacity = 0  # Hacer que el cuadro de contador sea invisible al inicio
         self.add_widget(self.counter_label)
 
         # Inicializar el contador
@@ -50,6 +65,8 @@ class DesktopWidget(Widget):
                 self.button_color.r = 1
                 self.button_color.g = 0
                 self.button_color.b = 0
+                # Mostrar el cuadro de contador
+                self.counter_label.opacity = 1
             else:
                 # Cancelar la cuenta regresiva
                 if self.counter_event is not None:
@@ -60,6 +77,8 @@ class DesktopWidget(Widget):
                     self.button_color.r = 0
                     self.button_color.g = 1
                     self.button_color.b = 0
+                    # Ocultar el cuadro de contador
+                    self.counter_label.opacity = 0
 
     def update_counter(self, dt):
         self.counter -= 1
@@ -74,3 +93,5 @@ class DesktopWidget(Widget):
             self.button_color.g = 1
             self.button_color.b = 0
             self.counter_label.text = '0'
+            # Ocultar el cuadro de contador
+            self.counter_label.opacity = 0
