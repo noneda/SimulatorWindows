@@ -8,10 +8,11 @@ from .process import Process
 
 class DesktopWidget(Widget):
 
-    def __init__(self, **kwargs):
+    def __init__(self, App, **kwargs):
         super(DesktopWidget, self).__init__(**kwargs)
         
-        # Fondo azul
+        self.App = App
+
         with self.canvas.before:
             Color(0, 0, 1, 1)  # Color azul
             self.rect = Rectangle(size=Window.size, pos=self.pos)
@@ -106,21 +107,25 @@ class DesktopWidget(Widget):
             # Ocultar el cuadro de contador
             self.counter_label.opacity = 0
 
-
     def create_process(self, instance):
         if len(self.process) <= 5:
             obj = Process()
             self.process.append(obj)
             self.add_widget(obj)
             self.add_process_to_taskbar(obj)
+        else:
+            app = self.App.get_running_app()
+            app.siwth_to_dead()
+
 
     def add_process_to_taskbar(self, process):
         taskbar_icon = Widget(size=(40, 40), pos=( self.taskbar_pos_x, 0))
         self.taskbar_pos_x += 50
         with taskbar_icon.canvas:
-            Color(0,0,0)  # Color gris
+            Color(*process.color)  # Color gris
             Rectangle(size=taskbar_icon.size, pos=taskbar_icon.pos)
         taskbar_icon.process = process
+        taskbar_icon.color = process.color
         taskbar_icon.bind(on_touch_down=self.on_taskbar_icon_touch_down)
 
         self.taskbar.add_widget(taskbar_icon)
@@ -146,6 +151,6 @@ class DesktopWidget(Widget):
             icon.pos = (self.taskbar_pos_x, 0)
             icon.canvas.clear()
             with icon.canvas:
-                Color(0,0,0)  # Color gris
+                Color(*icon.color)  # Color gris
                 Rectangle(size=icon.size, pos=icon.pos)
             self.taskbar_pos_x += 50

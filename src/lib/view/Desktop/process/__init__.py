@@ -1,7 +1,15 @@
 from kivy.uix.widget import Widget
-from kivy.uix.label import Label
 from kivy.graphics import Rectangle, Color
 from kivy.core.window import Window
+
+import random
+colors = [
+    (255, 255, 255),  # Blanco
+    (255, 0, 0),      # Rojo
+    (0, 255, 0),      # Verde
+    (255, 255, 0),    # Amarillo
+    (0,0,0)
+]
 
 class Process(Widget):
     def __init__(self, **kwargs):
@@ -9,9 +17,10 @@ class Process(Widget):
         self.size = (200, 100)  # Tamaño del proceso
         self.pos = (Window.width / 2 - self.size[0] / 2, Window.height / 2 - self.size[1] / 2)  # Centrar al inicio
         self.dragging = False
+        self.color = random.choice(colors)
 
         with self.canvas.before:
-            Color(0, 0, 0)  # Fondo gris
+            Color(*self.color)  # Fondo gris
             self.rect = Rectangle(size=self.size, pos=self.pos)
         
         self.bind(pos=self.update_rect, size=self.update_rect)

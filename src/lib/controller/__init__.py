@@ -1,23 +1,28 @@
 
 from ..model import Status
+from ..view import ComputerApp
 
 class Computer(Status):
 
     Actions : tuple[bool, bool, bool]
+
     def __init__(self) -> None:
-        self.On()
+        print("On Pc?")
+        if "y" == input("\n\t y || n\n"):
+            self.On()
+        else:
+            self.Off()
         
     #* Actions that can be Use
-    def On(self) -> bool:
-        self.On = True
-        self.Screen().run()
-        return True
+    def On(self):
+        self.on = True
+        self.Screen = ComputerApp()
+        self.Screen.run()
 
-    def Off(self) -> bool:
-        self.On = True
+    def Off(self):
+        self.on = False
         del self.Process
         del self.Keyboard
-        return True
 
     def newProcess(self) -> int:
         new = len(self.status.Process)+1
