@@ -8,8 +8,6 @@ from .process import Process
 
 class DesktopWidget(Widget):
 
-    process = list[Process]
-
     def __init__(self, **kwargs):
         super(DesktopWidget, self).__init__(**kwargs)
         
@@ -53,6 +51,9 @@ class DesktopWidget(Widget):
 
         # Actualizar la posición del contador
         self.update_label_position()
+
+        self.process  = []
+        self.taskbar_icons  = []
 
     def update_label_position(self, *args):
         # Centrar el label
@@ -107,10 +108,11 @@ class DesktopWidget(Widget):
 
 
     def create_process(self, instance):
-        process = Process()
-        self.process.append(process)
-        self.add_widget(process)
-        self.add_process_to_taskbar(process)
+        if len(self.process) <= 5:
+            obj = Process()
+            self.process.append(obj)
+            self.add_widget(obj)
+            self.add_process_to_taskbar(obj)
 
     def add_process_to_taskbar(self, process):
         taskbar_icon = Widget(size=(40, 40), pos=( self.taskbar_pos_x, 0))
@@ -118,11 +120,32 @@ class DesktopWidget(Widget):
         with taskbar_icon.canvas:
             Color(0,0,0)  # Color gris
             Rectangle(size=taskbar_icon.size, pos=taskbar_icon.pos)
-        taskbar_icon.bind(on_touch_down=lambda instance, touch: self.remove_process(instance, process))
-        self.taskbar.add_widget(taskbar_icon)
+        taskbar_icon.process = process
+        taskbar_icon.bind(on_touch_down=self.on_taskbar_icon_touch_down)
 
-    def remove_process(self, instance, process):
+        self.taskbar.add_widget(taskbar_icon)
+        self.taskbar_icons.append(taskbar_icon)
+
+    def on_taskbar_icon_touch_down(self, instance, touch):
+        if instance.collide_point(*touch.pos):
+            process = instance.process
+            if process in self.process:
+                self.remove_process(process)
+                self.taskbar.remove_widget(instance)
+                self.taskbar_icons.remove(instance)
+
+    def remove_process(self, process):
         if process in self.process:
+            self.process.remove(process)
             self.remove_widget(process)
-            self.processes.remove(process)
-            self.taskbar.remove_widget(instance)
+            self.reorder_taskbar_icons()
+
+    def reorder_taskbar_icons(self):
+        self.taskbar_pos_x = 50
+        for icon in self.taskbar_icons:
+            icon.pos = (self.taskbar_pos_x, 0)
+            icon.canvas.clear()
+            with icon.canvas:
+                Color(0,0,0)  # Color gris
+                Rectangle(size=icon.size, pos=icon.pos)
+            self.taskbar_pos_x += 50
