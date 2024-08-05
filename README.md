@@ -234,7 +234,7 @@ classDiagram
     DesktopWidget --> Process
     DesktopWidget --> BlueDeathScreen
 ```
-
+## Diagrama de Flujo
 ```mermaid
 flowchart TD
     A[Start] --> B[DesktopWidget Initialized]
